@@ -1,0 +1,1004 @@
+# Interface Web para Avaliação de TCC (sem login)
+
+Vou remover o sistema de login e ajustar a interface para começar diretamente no painel principal.
+
+```html
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Avaliação de TCC</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --dark: #2c3e50;
+            --gray: #95a5a6;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Estilo do cabeçalho */
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 15px 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo i {
+            font-size: 28px;
+            color: var(--secondary);
+        }
+        
+        .logo h1 {
+            font-size: 22px;
+            font-weight: 600;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-info img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid var(--secondary);
+        }
+        
+        /* Estilo dos cards */
+        .card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 25px;
+            margin-bottom: 25px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+        
+        .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .card-title i {
+            margin-right: 10px;
+            color: var(--secondary);
+        }
+        
+        /* Estilo dos botões */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 14px;
+        }
+        
+        .btn-primary {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #219955;
+        }
+        
+        .btn-warning {
+            background-color: var(--warning);
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background-color: #e67e22;
+        }
+        
+        .btn-danger {
+            background-color: var(--accent);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        
+        /* Estilo das abas */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            font-weight: 500;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .tab:hover {
+            color: var(--secondary);
+        }
+        
+        .tab.active {
+            color: var(--secondary);
+            border-bottom-color: var(--secondary);
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Estilo da tabela */
+        .table-responsive {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .status {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .status.pendente {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .status.em-andamento {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .status.avaliado {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .status.revisao {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        /* Estilo do formulário de avaliação */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: var(--secondary);
+            outline: none;
+        }
+        
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .rating-scale {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .rating-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            margin-bottom: 5px;
+        }
+        
+        .rating-option:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .rating-option input {
+            margin-bottom: 5px;
+        }
+        
+        .criteria-list {
+            margin-top: 20px;
+        }
+        
+        .criterion {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .criterion-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+        
+        .criterion-description {
+            font-size: 14px;
+            color: var(--gray);
+            margin-bottom: 15px;
+        }
+        
+        /* Estilo da dashboard */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        }
+        
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+        
+        .stat-icon.blue {
+            background-color: var(--secondary);
+        }
+        
+        .stat-icon.green {
+            background-color: var(--success);
+        }
+        
+        .stat-icon.orange {
+            background-color: var(--warning);
+        }
+        
+        .stat-icon.red {
+            background-color: var(--accent);
+        }
+        
+        .stat-info h3 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .stat-info p {
+            color: var(--gray);
+            font-size: 14px;
+        }
+        
+        .chart-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+        
+        .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+        
+        /* Mensagem de boas-vindas */
+        .welcome-message {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .welcome-text h2 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .welcome-text p {
+            opacity: 0.9;
+        }
+        
+        .welcome-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .tabs {
+                flex-wrap: wrap;
+            }
+            
+            .stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .welcome-message {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .welcome-actions {
+                margin-top: 20px;
+                width: 100%;
+                justify-content: flex-start;
+            }
+            
+            .rating-scale {
+                justify-content: flex-start;
+                gap: 10px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .tab {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+            
+            .btn {
+                padding: 8px 15px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sistema Principal -->
+    <div id="mainSystem">
+        <header>
+            <div class="container header-content">
+                <div class="logo">
+                    <i class="fas fa-graduation-cap"></i>
+                    <h1>Sistema de Avaliação de TCC</h1>
+                </div>
+                
+                <div class="user-info">
+                    <div>
+                        <p style="font-weight: 500;">Prof. Dr. Carlos Silva</p>
+                        <p style="font-size: 14px; color: #bdc3c7;">Avaliador</p>
+                    </div>
+                    <img src="https://i.pravatar.cc/150?img=8" alt="Foto do usuário">
+                </div>
+            </div>
+        </header>
+        
+        <main class="container">
+            <!-- Mensagem de boas-vindas -->
+            <div class="welcome-message">
+                <div class="welcome-text">
+                    <h2>Bem-vindo ao Sistema de Avaliação de TCC</h2>
+                    <p>Você tem 7 TCCs para avaliar, sendo 3 com prazo próximo do vencimento.</p>
+                </div>
+                <div class="welcome-actions">
+                    <button class="btn btn-primary" id="startEvaluation">
+                        <i class="fas fa-clipboard-check"></i> Iniciar Avaliação
+                    </button>
+                    <button class="btn btn-success" id="viewStats">
+                        <i class="fas fa-chart-bar"></i> Ver Estatísticas
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Abas de navegação -->
+            <div class="tabs">
+                <div class="tab active" data-tab="dashboard">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </div>
+                <div class="tab" data-tab="tccList">
+                    <i class="fas fa-list"></i> TCCs para Avaliar
+                </div>
+                <div class="tab" data-tab="evaluation">
+                    <i class="fas fa-clipboard-check"></i> Nova Avaliação
+                </div>
+                <div class="tab" data-tab="results">
+                    <i class="fas fa-chart-bar"></i> Resultados
+                </div>
+            </div>
+            
+            <!-- Conteúdo das abas -->
+            
+            <!-- Dashboard -->
+            <div id="dashboard" class="tab-content active">
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-icon blue">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>7</h3>
+                            <p>TCCs para avaliar</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon green">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>12</h3>
+                            <p>TCCs avaliados</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon orange">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>3</h3>
+                            <p>Prazos próximos</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon red">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>2</h3>
+                            <p>Revisões necessárias</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-bell"></i> Notificações Recentes
+                        </div>
+                        <button class="btn btn-primary" id="markAllRead">
+                            <i class="fas fa-check-double"></i> Marcar todas como lidas
+                        </button>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Mensagem</th>
+                                    <th>TCC</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>15/06/2023</td>
+                                    <td>Novo TCC atribuído para avaliação</td>
+                                    <td>IA na Educação: Uma Análise</td>
+                                    <td><span class="status pendente">Pendente</span></td>
+                                </tr>
+                                <tr>
+                                    <td>14/06/2023</td>
+                                    <td>Lembrete: Prazo de avaliação termina em 2 dias</td>
+                                    <td>Blockchain e Segurança de Dados</td>
+                                    <td><span class="status em-andamento">Em andamento</span></td>
+                                </tr>
+                                <tr>
+                                    <td>13/06/2023</td>
+                                    <td>Sua avaliação foi recebida pelo aluno</td>
+                                    <td>Sustentabilidade Urbana</td>
+                                    <td><span class="status avaliado">Avaliado</span></td>
+                                </tr>
+                                <tr>
+                                    <td>12/06/2023</td>
+                                    <td>Nova versão do TCC disponível para revisão</td>
+                                    <td>Realidade Virtual na Medicina</td>
+                                    <td><span class="status revisao">Revisão</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-calendar-alt"></i> Próximos Prazos
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Título</th>
+                                    <th>Autor(es)</th>
+                                    <th>Data Limite</th>
+                                    <th>Dias Restantes</th>
+                                    <th>Ação</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Blockchain e Segurança de Dados Pessoais</td>
+                                    <td>Carlos Mendes</td>
+                                    <td>18/06/2023</td>
+                                    <td><span style="color: var(--accent); font-weight: bold;">2 dias</span></td>
+                                    <td>
+                                        <button class="btn btn-primary btn-sm avaliar-btn" data-id="2">
+                                            <i class="fas fa-clipboard-check"></i> Avaliar
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Inteligência Artificial na Educação: Uma Análise</td>
+                                    <td>Ana Souza, Pedro Costa</td>
+                                    <td>20/06/2023</td>
+                                    <td><span style="color: var(--warning); font-weight: bold;">4 dias</span></td>
+                                    <td>
+                                        <button class="btn btn-primary btn-sm avaliar-btn" data-id="1">
+                                            <i class="fas fa-clipboard-check"></i> Avaliar
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Sustentabilidade Urbana: Análise de Caso</td>
+                                    <td>Mariana Lima</td>
+                                    <td>15/06/2023</td>
+                                    <td><span style="color: var(--success); font-weight: bold;">Concluído</span></td>
+                                    <td>
+                                        <button class="btn btn-success btn-sm visualizar-btn" data-id="3">
+                                            <i class="fas fa-eye"></i> Visualizar
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Lista de TCCs para avaliar -->
+            <div id="tccList" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-list"></i> TCCs Atribuídos para Avaliação
+                        </div>
+                        <div>
+                            <button class="btn btn-primary" id="refreshList">
+                                <i class="fas fa-sync-alt"></i> Atualizar
+                            </button>
+                            <button class="btn btn-success" id="exportList">
+                                <i class="fas fa-download"></i> Exportar
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Título</th>
+                                    <th>Autor(es)</th>
+                                    <th>Orientador</th>
+                                    <th>Data de Submissão</th>
+                                    <th>Prazo</th>
+                                    <th>Status</th>
+                                    <th>Ação</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Inteligência Artificial na Educação: Uma Análise</td>
+                                    <td>Ana Souza, Pedro Costa</td>
+                                    <td>Prof. Dr. Roberto Alves</td>
+                                    <td>10/06/2023</td>
+                                    <td>20/06/2023</td>
+                                    <td><span class="status pendente">Pendente</span></td>
+                                    <td>
+                                        <button class="btn btn-primary btn-sm avaliar-btn" data-id="1">
+                                            <i class="fas fa-clipboard-check"></i> Avaliar
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Blockchain e Segurança de Dados Pessoais</td>
+                                    <td>Carlos Mendes</td>
+                                    <td>Profa. Dra. Maria Santos</td>
+                                    <td>05/06/2023</td>
+                                    <td>18/06/2023</td>
+                                    <td><span class="status em-andamento">Em andamento</span></td>
+                                    <td>
+                                        <button class="btn btn-warning btn-sm continuar-btn" data-id="2">
+                                            <i class="fas fa-edit"></i> Continuar
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Sustentabilidade Urbana: Análise de Caso</td>
+                                    <td>Mariana Lima</td>
+                                    <td>Prof. Dr. Fernando Oliveira</td>
+                                    <td>01/06/2023</td>
+                                    <td>15/06/2023</td>
+                                    <td><span class="status avaliado">Avaliado</span></td>
+                                    <td>
+                                        <button class="btn btn-success btn-sm visualizar-btn" data-id="3">
+                                            <i class="fas fa-eye"></i> Visualizar
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Realidade Virtual Aplicada à Medicina</td>
+                                    <td>João Pereira, Luiza Ferreira</td>
+                                    <td>Profa. Dra. Claudia Ramos</td>
+                                    <td>28/05/2023</td>
+                                    <td>10/06/2023</td>
+                                    <td><span class="status revisao">Revisão</span></td>
+                                    <td>
+                                        <button class="btn btn-primary btn-sm revisar-btn" data-id="4">
+                                            <i class="fas fa-redo"></i> Revisar
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Impacto das Redes Sociais no Comportamento Juvenil</td>
+                                    <td>Fernanda Oliveira</td>
+                                    <td>Prof. Dr. Antônio Nunes</td>
+                                    <td>25/05/2023</td>
+                                    <td>05/06/2023</td>
+                                    <td><span class="status avaliado">Avaliado</span></td>
+                                    <td>
+                                        <button class="btn btn-success btn-sm visualizar-btn" data-id="5">
+                                            <i class="fas fa-eye"></i> Visualizar
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Energias Renováveis em Áreas Rurais</td>
+                                    <td>Ricardo Santos, Juliana Costa</td>
+                                    <td>Profa. Dra. Sandra Martins</td>
+                                    <td>20/05/2023</td>
+                                    <td>30/05/2023</td>
+                                    <td><span class="status avaliado">Avaliado</span></td>
+                                    <td>
+                                        <button class="btn btn-success btn-sm visualizar-btn" data-id="6">
+                                            <i class="fas fa-eye"></i> Visualizar
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Formulário de avaliação -->
+            <div id="evaluation" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-clipboard-check"></i> Avaliação de TCC
+                        </div>
+                        <div>
+                            <button class="btn btn-warning" id="saveDraft">
+                                <i class="fas fa-save"></i> Salvar Rascunho
+                            </button>
+                            <button class="btn btn-success" id="submitEvaluation">
+                                <i class="fas fa-paper-plane"></i> Enviar Avaliação
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="tccTitle">Título do TCC</label>
+                        <input type="text" id="tccTitle" class="form-control" value="Inteligência Artificial na Educação: Uma Análise" readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="authors">Autor(es)</label>
+                        <input type="text" id="authors" class="form-control" value="Ana Souza, Pedro Costa" readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="advisor">Orientador</label>
+                        <input type="text" id="advisor" class="form-control" value="Prof. Dr. Roberto Alves" readonly>
+                    </div>
+                    
+                    <div class="criteria-list">
+                        <h3 style="margin-bottom: 20px; color: var(--primary);">Critérios de Avaliação</h3>
+                        
+                        <div class="criterion">
+                            <div class="criterion-title">1. Estrutura e organização do trabalho</div>
+                            <div class="criterion-description">Avalie a organização, formatação, coerência e coesão do trabalho, incluindo elementos pré-textuais, textuais e pós-textuais.</div>
+                            <div class="rating-scale">
+                                <div class="rating-option">
+                                    <input type="radio" name="criterion1" id="c1-1" value="1">
+                                    <label for="c1-1">1 - Insuficiente</label>
+                                </div>
+                                <div class="rating-option">
+                                    <input type="radio" name="criterion1" id="c1-2" value="2">
+                                    <label for="c1-2">2 - Regular</label>
+                                </div>
+                                <div class="rating-option">
+                                    <input type="radio" name="criterion1" id="c1-3" value="3">
+                                    <label for="c1-3">3 - Bom</label>
+                                </div>
+                                <div class="rating-option">
+                                    <input type="radio" name="criterion1" id="c1-4" value="4">
+                                    <label for="c1-4">4 - Muito Bom</label>
+                                </div>
+                                <div class="rating-option">
+                                    <input type="radio" name="criterion1" id="c1-5" value="5">
+                                    <label for="c1-5">5 - Excelente</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="criterion">
+                            <div class="criterion-title">2. Relevância e originalidade do tema</div>
+                            <div class="criterion-description">Avalie a pertinência do tema, sua relevância acadêmica e/ou profissional, e o grau de originalidade da abordagem.</div>
+                            <div class="rating-scale">
+                                <div class="rating-option">
+                                    <input type="radio" name="criterion2" id="c2-1" value="1">
+                                    <label for="c2-1">1 - Insuficiente</label>
+                                </div>
+                                <div class="rating-option">
+                                    <input type="radio" name="criterion2" id="c2-2" value="2">
+                                    <label for="c2-2">2 - Regular</label>
+                                </div>
+                                <div class="rating-option">
+                                    <input type="radio" name="criterion2" id="c2-3" value="3">
+                                    <label for="c2-3">3 - Bom</label>
+                                </div>
+                                <div class="rating-option">
+                                    <input type="radio" name="criterion2" id="c2-4" value="4">
+                                    <label for="c2-4">4 - Muito Bom</label>
+                                </div>
+                                <div class="rating-option">
+                                    <input type="radio" name="criterion2" id="c2-5" value="5">
+                                    <label for="c2-5">5 - Excelente</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="criterion">
+                            <div class="criterion-title">3. Fundamentação teórica e revisão da literatura</div>
+                            <div class="criterion-description">Avalie a qualidade e abrangência da revisão bibliográfica, a consistência teórica e a adequação das referências.</div>
+                            <div class="rating-scale">
+                                <div class="rating-option">
+                                    <input type="radio" name="criterion3" id="c3-1" value="1">
+                                    <label for="c3-1">1 - Insuficiente</label>
+                                </div>
+                                <div class="rating-option">
+                                    <input type="radio" name="criterion3" id="c3-2" value="2">
+                                    <label for="c3-2">2 - Regular</label>
+                                </div>
+                                <div class="rating-option">
+                                    <input type="radio" name="criterion3" id="c3-3" value="3">
+                                    <label for="c3-3">3 - Bom</label>
+                                </div>
+                                <div class="rating-option">
+                                    <input type="radio" name="criterion3" id="c3-4" value="4">
+                                    <label for="c3-4">4 - Muito Bom</label>
+                                </div>
+                                <div class="rating-option">
+                                    <input type="radio" name="criterion3" id="c3-5" value="5">
+                                    <label for="c3-5">5 - Excelente</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="criterion">
+                            <div class="criterion-title">4. Metodologia e coleta de dados</div>
+                            <div class="criterion-description">Avalie a adequação da metodologia, a descrição dos procedimentos, a validade e confiabilidade dos instrumentos de coleta de dados.</div>
+                            <div class="rating-scale">
+                                <div class="rating-option">
+                                    <input type="radio" name="criterion4" id="c4-1" value="1">
+                                    <label for="c4-1">1 - Insuficiente</label>
+                                </div>
+                                <div class="rating-option">
+                                    <input type="radio" name="criterion4" id="c4-2" value="2">
+                                    <label for="c4-2">2 - Regular</label>
+                                </div>
+                                <div class="rating-option">
+                                    <input type="radio" name="criterion4" id="c4-3" value="3">
+                                    <label for="c4-3">3 - Bom</label>
+                                </div>
+                                <div class="rating-option">
+                                    <input type="radio" name="criterion4" id="c4-4" value="4">
+                                    <label for="c4-4">4 - Muito Bom</label>
+                                </div>
+                                <div class="rating-option">
+                                    <input type="radio" name="criterion4" id="c4-5" value="5">
+                                    <label for="c4-5">5 - Excelente</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="criterion">
+                            <div class="criterion-title">5. Análise de resultados e discussão</div>
+                            <div class="criterion-description">Avalie a qualidade da análise, a interpretação dos resultados, a consistência da discussão e a relação com o referencial teórico.</div>
+                            <div class="rating-scale">
+                                <div class="rating-option">
+                                    <input type="radio" name="criterion5" id="c5-1" value="1">
+                                    <label for="c5-1">1 - Insuficiente</label>
+                                </div>
+                                <div class="rating-option">
+                                    <input type="radio" name="criterion5" id="c5-2" value="2">
+                                    <label for="c5-2">2 - Regular</label>
+                                </div>
+                                <div class="rating-option">
+                                    <input type="radio" name="criterion5" id="c5-3" value="3">
+                                    <label for="c5-3">3 - Bom</label>
+                                </div>
+                                <div class="rating-option">
+                                    <input type="radio" name="criterion5" id="c5-4" value="4">
+                                    <label for="c5-4">4 - Muito Bom</label>
+                                </div>
+                                <div class="rating-option">
+                                    <input type="radio" name="criterion5" id="c5-5" value="5">
+                                    <label for="c5-5">5 - Excelente</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="criterion">
+                            <div class="criterion-title">6. Conclusões e contribuições</div>
+                            <div class="criterion-description">Avalie a clareza das conclusões, a relação com os objetivos propostos e as contribuições do trabalho para a área de conhecimento.</div>
+                            <div class="rating-scale">
+                                <div class="rating-option">
+                                    <input type="radio" name="criterion6" id="c6-1" value="1">
+                                    <label for="c6-1">1 - Insuficiente</label>
+                                </div>
+                                <div class="rating-option">
+                                    <input type="radio" name="criterion6" id="c6-2" value="2">
+                                    <label for="c6-2">2 - Regular</label>
+                                </div>
+                                <div class="rating-option">
+                                    <input type="radio" name="criterion6" id="c6-3" value="3">
+                                    <label for="

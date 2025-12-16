@@ -1,0 +1,160 @@
+CREATE DATABASE IF NOT EXISTS sistema_tcc;
+USE sistema_tcc;
+
+CREATE TABLE tcc (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    titulo VARCHAR(255) NOT NULL,
+    resumo TEXT,
+    area VARCHAR(100),
+    orientador VARCHAR(100),
+    arquivo_pdf VARCHAR(255),
+    status ENUM(
+        'Aguardando',
+        'Em Avaliação',
+        'Correções',
+        'Aprovado',
+        'Reprovado'
+    ) DEFAULT 'Aguardando',
+    nota_final DECIMAL(5,2),
+    data_cadastro DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE aluno (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    matricula VARCHAR(50) UNIQUE NOT NULL,
+    email VARCHAR(100) UNIQUE
+);
+
+CREATE TABLE tcc_aluno (
+    tcc_id INT,
+    aluno_id INT,
+    PRIMARY KEY (tcc_id, aluno_id),
+    FOREIGN KEY (tcc_id) REFERENCES tcc(id),
+    FOREIGN KEY (aluno_id) REFERENCES aluno(id)
+);
+
+CREATE TABLE avaliador (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE,
+    instituicao VARCHAR(100),
+    titulacao ENUM('Especialista','Mestre','Doutor') DEFAULT 'Mestre'
+);
+
+CREATE TABLE banca (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    tcc_id INT NOT NULL,
+    data DATE,
+    hora TIME,
+    local VARCHAR(100),
+    FOREIGN KEY (tcc_id) REFERENCES tcc(id)
+);
+
+CREATE TABLE banca_avaliadores (
+    banca_id INT,
+    avaliador_id INT,
+    papel ENUM('Presidente','Membro','Suplente') DEFAULT 'Membro',
+    PRIMARY KEY (banca_id, avaliador_id),
+    FOREIGN KEY (banca_id) REFERENCES banca(id),
+    FOREIGN KEY (avaliador_id) REFERENCES avaliador(id)
+);
+
+CREATE TABLE categoria_criterio (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    peso DECIMAL(5,2) DEFAULT 1.0
+);
+
+CREATE TABLE criterio (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    categoria_id INT NOT NULL,
+    nome VARCHAR(150) NOT NULL,
+    peso DECIMAL(5,2) DEFAULT 1.0,
+    nota_minima DECIMAL(4,2) DEFAULT 0,
+    FOREIGN KEY (categoria_id) REFERENCES categoria_criterio(id)
+);
+
+CREATE TABLE avaliacao_fase (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome ENUM(
+        'Documento',
+        'Apresentação',
+        'Defesa Final'
+    ) NOT NULL,
+    peso DECIMAL(5,2) DEFAULT 1.0
+);
+
+CREATE TABLE avaliacao (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    banca_id INT NOT NULL,
+    avaliador_id INT NOT NULL,
+    criterio_id INT NOT NULL,
+    fase_id INT NOT NULL,
+    nota DECIMAL(4,2) CHECK (nota BETWEEN 0 AND 10),
+    comentario TEXT,
+    FOREIGN KEY (banca_id) REFERENCES banca(id),
+    FOREIGN KEY (avaliador_id) REFERENCES avaliador(id),
+    FOREIGN KEY (criterio_id) REFERENCES criterio(id),
+    FOREIGN KEY (fase_id) REFERENCES avaliacao_fase(id)
+);
+
+CREATE TABLE resultado_avaliador (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    banca_id INT,
+    avaliador_id INT,
+    nota_final DECIMAL(5,2),
+    recomendacao ENUM(
+        'Aprovação',
+        'Aprovação com Correções',
+        'Reprovação'
+    ),
+    parecer_final TEXT,
+    FOREIGN KEY (banca_id) REFERENCES banca(id),
+    FOREIGN KEY (avaliador_id) REFERENCES avaliador(id)
+);
+
+INSERT INTO categoria_criterio (nome, peso) VALUES
+('Trabalho Escrito', 1.2),
+('Conteúdo Técnico', 1.5),
+('Apresentação Oral', 1.0),
+('Pesquisa e Metodologia', 1.3);
+
+INSERT INTO criterio (categoria_id, nome, peso, nota_minima) VALUES
+(1, 'Normas ABNT', 1.0, 5),
+(1, 'Coesão e Clareza Textual', 1.2, 5),
+(2, 'Domínio do Tema', 1.5, 6),
+(2, 'Originalidade', 1.0, 5),
+(3, 'Postura e Comunicação', 1.0, 5),
+(3, 'Uso de Recursos Visuais', 0.8, 5),
+(4, 'Metodologia Científica', 1.5, 6),
+(4, 'Referencial Teórico', 1.2, 5);
+
+INSERT INTO avaliacao_fase (nome, peso) VALUES
+('Documento', 1.0),
+('Apresentação', 1.2),
+('Defesa Final', 1.5);
+
+DELIMITER $$
+
+CREATE FUNCTION media_final_tcc(tccId INT)
+RETURNS DECIMAL(5,2)
+DETERMINISTIC
+BEGIN
+    DECLARE media DECIMAL(5,2);
+
+    SELECT 
+        SUM(a.nota * c.peso * cat.peso * f.peso) /
+        SUM(c.peso * cat.peso * f.peso)
+    INTO media
+    FROM avaliacao a
+    JOIN criterio c ON c.id = a.criterio_id
+    JOIN categoria_criterio cat ON cat.id = c.categoria_id
+    JOIN avaliacao_fase f ON f.id = a.fase_id
+    JOIN banca b ON b.id = a.banca_id
+    WHERE b.tcc_id = tccId;
+
+    RETURN ROUND(media,2);
+END $$
+
+DELIMITER ;

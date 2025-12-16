@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gerenciamento de TCC</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #34495e;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+        
+        nav ul li {
+            margin-left: 20px;
+        }
+        
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            transition: background-color 0.3s;
+        }
+        
+        nav ul li a:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+        
+        .auth-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid white;
+            color: white;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .hero {
+            background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+            color: white;
+            padding: 4rem 0;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+        }
+        
+        .search-box {
+            max-width: 600px;
+            margin: 0 auto;
+            display: flex;
+        }
+        
+        .search-box input {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 4px 0 0 4px;
+            font-size: 1rem;
+        }
+        
+        .search-box button {
+            padding: 0 20px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--primary-color);
+        }
+        
+        .tcc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 3rem;
+        }
+        
+        .tcc-card {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        
+        .tcc-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .tcc-card-content {
+            padding: 1.5rem;
+        }
+        
+        .tcc-card h3 {
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+        
+        .tcc-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .tcc-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 1rem;
+        }
+        
+        .tag {
+            background-color: var(--light-color);
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+        
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            margin-top: 3rem;
+        }
+        
+        .login-modal, .register-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .form-footer {
+            margin-top: 1.5rem;
+            text-align: center;
+        }
+        
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            nav ul {
+                margin-top: 10px;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .tcc-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <div class="logo">Sistema TCC</div>
+            <nav>
+                <ul>
+                    <li><a href="#inicio">Início</a></li>
+                    <li><a href="#tccs">TCCs</a></li>
+                    <li><a href="#sobre">Sobre</a></li>
+                    <li><a href="#contato">Contato</a></li>
+                </ul>
+            </nav>
+            <div class="auth-buttons">
+                <button class="btn btn-outline" id="loginBtn">Login</button>
+                <button class="btn btn-primary" id="registerBtn">Cadastrar</button>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero" id="inicio">
+        <div class="container">
+            <h1>Repositório de Trabalhos de Conclusão de Curso</h1>
+            <p>Explore trabalhos acadêmicos de alunos e professores. Pesquise por tema, autor ou palavra-chave.</p>
+            <div class="search-box">
+                <input type="text" placeholder="Digite o título, autor ou palavra-chave...">
+                <button>Buscar</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="container" id="tccs">
+        <h2 class="section-title">TCCs Recentes</h2>
+        <div class="tcc-grid" id="tccList">
+            <!-- Os TCCs serão carregados aqui via JavaScript -->
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>Sistema de Gerenciamento de TCC &copy; 2023 - Todos os direitos reservados</p>
+        </div>
+    </footer>
+
+    <!-- Modal de Login -->
+    <div class="login-modal" id="loginModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Login</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginEmail">E-mail</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Senha</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <div class="form-footer">
+                    <button type="submit" class="btn btn-primary">Entrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Cadastro -->
+    <div class="register-modal" id="registerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Cadastro</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="registerName">Nome Completo</label>
+                    <input type="text" id="registerName" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerEmail">E-mail</label>
+                    <input type="email" id="registerEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerType">Tipo de Usuário</label>
+                    <select id="registerType" required>
+                        <option value="">Selecione...</option>
+                        <option value="aluno">Aluno</option>
+                        <option value="professor">Professor</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">Senha</label>
+                    <input type="password" id="registerPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerConfirmPassword">Confirmar Senha</label>
+                    <input type="password" id="registerConfirmPassword" required>
+                </div>
+                <div class="form-footer">
+                    <button type="submit" class="btn btn-primary">Cadastrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Dados de exemplo para demonstração
+        const tccs = [
+            {
+                id: 1,
+                titulo: "Análise de Algoritmos de Machine Learning para Detecção de Fraudes",
+                resumo: "Este trabalho analisa diferentes algoritmos de machine learning aplicados à detecção de transações fraudulentas em sistemas financeiros...",
+                autor: "João Silva",
+                orientador: "Prof. Dr. Carlos Mendes",
+                curso: "Ciência da Computação",
+                ano: 2023,
+                semestre: "2",
+                palavrasChave: ["Machine Learning", "Fraude", "Finanças", "Algoritmos"]
+            },
+            {
+                id: 2,
+                titulo: "Sistema de Gestão Energética para Residências Inteligentes",
+                resumo: "Desenvolvimento de um sistema IoT para monitoramento e controle do consumo energético em residências, visando economia e sustentabilidade...",
+                autor: "Maria Oliveira",
+                orientador: "Prof. Dra. Ana Santos",
+                curso: "Engenharia Elétrica",
+                ano: 2023,
+                semestre: "1",
+                palavrasChave: ["IoT", "Energia", "Sustentabilidade", "Automação Residencial"]
+            },
+            {
+                id: 3,
+                titulo: "Impacto das Redes Sociais na Saúde Mental de Adolescentes",
+                resumo: "Pesquisa qualitativa sobre a relação entre o uso de redes sociais e indicadores de saúde mental em adolescentes de 14 a 18 anos...",
+                autor: "Pedro Costa",
+                orientador: "Prof. Dr. Roberto Almeida",
+                curso: "Psicologia",
+                ano: 2022,
+                semestre: "2",
+                palavrasChave: ["Redes Sociais", "Saúde Mental", "Adolescentes", "Psicologia"]
+            }
+        ];
+
+        // Elementos DOM
+        const tccList = document.getElementById('tccList');
+        const loginModal = document.getElementById('loginModal');
+        const registerModal = document.getElementById('registerModal');
+        const loginBtn = document.getElementById('loginBtn');
+        const registerBtn = document.getElementById('registerBtn');
+        const closeButtons = document.querySelectorAll('.close-modal');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+
+        // Carregar TCCs na página
+        function carregarTCCs() {
+            tccList.innerHTML = '';
+            
+            tccs.forEach(tcc => {
+                const tccCard = document.createElement('div');
+                tccCard.className = 'tcc-card';
+                
+                const tagsHTML = tcc.palavrasChave.map(tag => 
+                    `<span class="tag">${tag}</span>`
+                ).join('');
+                
+                tccCard.innerHTML = `
+                    <div class="tcc-card-content">
+                        <h3>${tcc.titulo}</h3>
+                        <p>${tcc.resumo.substring(0, 150)}...</p>
+                        <div class="tcc-meta">
+                            <span>${tcc.autor}</span>
+                            <span>${tcc.ano}/${tcc.semestre}</span>
+                        </div>
+                        <div class="tcc-tags">
+                            ${tagsHTML}
+                        </div>
+                    </div>
+                `;
+                
+                tccList.appendChild(tccCard);
+            });
+        }
+
+        // Mostrar modal de login
+        loginBtn.addEventListener('click', () => {
+            loginModal.style.display = 'flex';
+        });
+
+        // Mostrar modal de cadastro
+        registerBtn.addEventListener('click', () => {
+            registerModal.style.display = 'flex';
+        });
+
+        // Fechar modais
+        closeButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                loginModal.style.display = 'none';
+                registerModal.style.display = 'none';
+            });
+        });
+
+        // Fechar modal ao clicar fora
+        window.addEventListener('click', (e) => {
+            if (e.target === loginModal) {
+                loginModal.style.display = 'none';
+            }
+            if (e.target === registerModal) {
+                registerModal.style.display = 'none';
+            }
+        });
+
+        // Processar formulário de login
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            // Aqui seria feita a validação com o backend
+            alert(`Login realizado com: ${email}`);
+            loginModal.style.display = 'none';
+            loginForm.reset();
+        });
+
+        // Processar formulário de cadastro
+        registerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const type = document.getElementById('registerType').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('registerConfirmPassword').value;
+            
+            if (password !== confirmPassword) {
+                alert('As senhas não coincidem!');
+                return;
+            }
+            
+            // Aqui seria feita a validação com o backend
+            alert(`Cadastro realizado: ${name} (${type})`);
+            registerModal.style.display = 'none';
+            registerForm.reset();
+        });
+
+        // Inicializar a página
+        carregarTCCs();
+    </script>
+</body>
+</html>
